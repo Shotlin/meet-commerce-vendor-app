@@ -67,6 +67,12 @@ class _SupplyDetailScreenState extends ConsumerState<SupplyDetailScreen> {
     }
   }
 
+  /// Mirrors the backend's own gate exactly
+  /// (vendor-procurement.service.js#attachEvidence) — evidence can only be
+  /// attached while the supply is actually being prepared, not immediately
+  /// after AWARDED and not once it's already PACKED/dispatched.
+  bool _canUploadEvidence(String status) => const {'ACCEPTED', 'PROCESSING', 'CLEANING'}.contains(status);
+
   @override
   Widget build(BuildContext context) {
     final supplyId = widget.supplyId;
@@ -203,14 +209,21 @@ class _SupplyDetailScreenState extends ConsumerState<SupplyDetailScreen> {
                           color: AppColors.warningSurface,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          'Quality evidence required\nRecord the cleaned product before packing.',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.5),
+                        child: Text(
+                          _canUploadEvidence(supply.status)
+                              ? 'Quality evidence required\nRecord the cleaned product before packing.'
+                              : 'Quality evidence required\nFirst work through Accepted → Processing → Cleaning using the button below — evidence can only be uploaded once this order is being prepared.',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.5),
                         ),
                       ),
                       const SizedBox(height: 10),
+                      // Backend only accepts evidence while status is
+                      // ACCEPTED/PROCESSING/CLEANING (vendor-procurement.
+                      // service.js#attachEvidence) — disabled outside that
+                      // window instead of letting the vendor tap through to
+                      // a guaranteed, confusingly-worded server rejection.
                       FilledButton.icon(
-                        onPressed: () => _uploadVideo(context, ref),
+                        onPressed: _canUploadEvidence(supply.status) ? () => _uploadVideo(context, ref) : null,
                         icon: const Icon(Icons.videocam, size: 18),
                         label: const Text('Record / Upload Video'),
                       ),

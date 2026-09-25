@@ -86,9 +86,18 @@ class ApiClient {
     }
   }
 
+  // `_dio`'s BaseOptions always sends Content-Type: application/json,
+  // regardless of whether a call actually has a body (accept/decline/
+  // withdraw-quote never did — they're bare POSTs with no payload).
+  // Fastify's built-in JSON body parser rejects a genuinely empty body
+  // when that header is present ("Body cannot be empty when content-type
+  // is set to 'application/json'") BEFORE the request ever reaches route
+  // validation or the handler — found live, blocking "Accept Offer".
+  // Defaulting a null body to `{}` here, once, fixes every existing
+  // bodyless call and prevents any future one from hitting the same wall.
   Future<dynamic> post(String path, {Object? body, Map<String, dynamic>? query}) async {
     try {
-      final response = await _dio.post(path, data: body, queryParameters: query);
+      final response = await _dio.post(path, data: body ?? const {}, queryParameters: query);
       return _unwrap(response);
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -97,7 +106,7 @@ class ApiClient {
 
   Future<dynamic> patch(String path, {Object? body}) async {
     try {
-      final response = await _dio.patch(path, data: body);
+      final response = await _dio.patch(path, data: body ?? const {});
       return _unwrap(response);
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -106,7 +115,7 @@ class ApiClient {
 
   Future<dynamic> put(String path, {Object? body}) async {
     try {
-      final response = await _dio.put(path, data: body);
+      final response = await _dio.put(path, data: body ?? const {});
       return _unwrap(response);
     } on DioException catch (error) {
       throw _toApiException(error);
