@@ -81,11 +81,24 @@ class _SupplyDetailScreenState extends ConsumerState<SupplyDetailScreen> {
 
     String? nextAction;
     if (supply != null) {
+      // Mirrors the backend's own SUPPLY_TRANSITIONS state machine exactly
+      // (vendor-procurement.service.js) — every status with a real next
+      // vendor-triggered transition needs a case here, or the sticky
+      // action button silently disappears (found live: VIDEO_SUBMITTED had
+      // no case at all, so "Mark Packed" never appeared after a video
+      // upload, even though the backend was ready and waiting for exactly
+      // that call). attachEvidence auto-advances CLEANING -> VIDEO_SUBMITTED
+      // the moment evidence is accepted, so VIDEO_SUBMITTED always already
+      // has evidence by construction — no extra check needed, unlike the
+      // CLEANING case below (a defensive fallback for the rare case evidence
+      // exists without the status having advanced, e.g. a non-video
+      // QUALITY_IMAGE upload that doesn't trigger the same auto-transition).
       nextAction = switch (supply.status) {
         'AWARDED' => 'Mark Accepted',
         'ACCEPTED' => 'Mark Processing Started',
         'PROCESSING' => 'Mark Cleaning Started',
         'CLEANING' => null, // handled below: upload video or mark packed
+        'VIDEO_SUBMITTED' => 'Mark Packed',
         'PACKED' => 'Mark Ready for Dispatch',
         'READY_FOR_DISPATCH' => 'Mark Dispatched',
         _ => null,
