@@ -54,11 +54,11 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _Section(icon: Icons.badge_outlined, title: 'Business Info', onTap: () {}),
-          _Section(icon: Icons.verified_outlined, title: 'Tax & Licenses', onTap: () {}),
-          _Section(icon: Icons.folder_outlined, title: 'Documents', onTap: () {}),
-          _Section(icon: Icons.location_on_outlined, title: 'Service Areas', onTap: () {}),
-          _Section(icon: Icons.category_outlined, title: 'Categories', onTap: () {}),
+          _Section(icon: Icons.badge_outlined, title: 'Business Info', onTap: () => context.push('/profile/business-info')),
+          _Section(icon: Icons.verified_outlined, title: 'Tax & Licenses', onTap: () => context.push('/profile/tax-licenses')),
+          _Section(icon: Icons.folder_outlined, title: 'Documents', onTap: () => context.push('/profile/documents')),
+          _Section(icon: Icons.storefront_outlined, title: 'Store Allotment', onTap: () => context.push('/profile/store-allotment')),
+          _Section(icon: Icons.category_outlined, title: 'Categories', onTap: () => context.push('/profile/categories')),
           _Section(
             icon: Icons.trending_up_outlined,
             title: 'My Performance',
@@ -66,7 +66,11 @@ class ProfileScreen extends ConsumerWidget {
               context.push('/performance');
             },
           ),
-          _Section(icon: Icons.notifications_outlined, title: 'Notification Settings', onTap: () {}),
+          _Section(
+            icon: Icons.notifications_outlined,
+            title: 'Notification Settings',
+            onTap: () => context.push('/profile/notification-settings'),
+          ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: () async {

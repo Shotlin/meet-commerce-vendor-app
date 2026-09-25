@@ -32,4 +32,13 @@ class ApiConstants {
   static String quoteDetail(String quoteId) => '$vendorQuotes/$quoteId';
   static String withdrawQuote(String quoteId) => '$vendorQuotes/$quoteId/withdraw';
   static String supplyDetail(String supplyId) => '$vendorSupplies/$supplyId';
+
+  // Vendor business profile (older `vendors` module — self-service via
+  // vendor-scoped JWT; the server resolves the real target from the JWT,
+  // this vendorId is only needed to satisfy the URL's :vendorId segment).
+  static String vendorDetail(String vendorId) => '/vendors/$vendorId';
+  static String vendorProfile(String vendorId) => '/vendors/$vendorId/profile';
+  static String vendorSettings(String vendorId) => '/vendors/$vendorId/settings';
+  static String vendorKycStatus(String vendorId) => '/vendor-kyc/$vendorId/kyc/status';
+  static String vendorKycSubmit(String vendorId) => '/vendor-kyc/$vendorId/kyc';
 }

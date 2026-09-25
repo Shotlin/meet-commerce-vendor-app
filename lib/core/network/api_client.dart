@@ -122,10 +122,23 @@ class ApiClient {
         code: data['code']?.toString(),
       );
     }
-    return ApiException(
-      'No internet connection. Check your network and try again.',
-      statusCode: null,
-    );
+    // No HTTP response reached us at all — could genuinely be no internet,
+    // but just as often a DNS/TLS/firewall issue or the server being down;
+    // distinguish what we can from dio's own classification rather than
+    // always blaming "no internet" (which was actively misleading while
+    // debugging a missing Android INTERNET permission — that failed at the
+    // OS socket layer with connectionError, not a timeout).
+    final message = switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout =>
+        'The server is taking too long to respond. Please try again.',
+      DioExceptionType.badCertificate => 'Couldn\'t verify the server\'s security certificate.',
+      DioExceptionType.connectionError =>
+        'Couldn\'t reach the server. Check your connection and try again.',
+      _ => 'No internet connection. Check your network and try again.',
+    };
+    return ApiException(message, statusCode: null);
   }
 }
 

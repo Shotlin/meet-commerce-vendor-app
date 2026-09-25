@@ -10,8 +10,14 @@ import '../features/active/presentation/screens/supply_detail_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/requests/presentation/screens/quote_form_screen.dart';
 import '../features/requests/presentation/screens/request_detail_screen.dart';
+import '../features/profile/presentation/screens/business_info_screen.dart';
+import '../features/profile/presentation/screens/categories_screen.dart';
+import '../features/profile/presentation/screens/documents_screen.dart';
+import '../features/profile/presentation/screens/notification_settings_screen.dart';
 import '../features/profile/presentation/screens/performance_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/profile/presentation/screens/store_allotment_screen.dart';
+import '../features/profile/presentation/screens/tax_licenses_screen.dart';
 import '../features/requests/presentation/screens/requests_screen.dart';
 import '../features/shell/presentation/vendor_shell.dart';
 
@@ -38,6 +44,30 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/performance',
         builder: (context, state) => const PerformanceScreen(),
+      ),
+      GoRoute(
+        path: '/profile/business-info',
+        builder: (context, state) => const BusinessInfoScreen(),
+      ),
+      GoRoute(
+        path: '/profile/tax-licenses',
+        builder: (context, state) => const TaxLicensesScreen(),
+      ),
+      GoRoute(
+        path: '/profile/documents',
+        builder: (context, state) => const DocumentsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/store-allotment',
+        builder: (context, state) => const StoreAllotmentScreen(),
+      ),
+      GoRoute(
+        path: '/profile/categories',
+        builder: (context, state) => const CategoriesScreen(),
+      ),
+      GoRoute(
+        path: '/profile/notification-settings',
+        builder: (context, state) => const NotificationSettingsScreen(),
       ),
       GoRoute(
         path: '/otp/:phone',

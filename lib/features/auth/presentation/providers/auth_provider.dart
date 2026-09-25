@@ -12,6 +12,7 @@ class AuthState {
     required this.status,
     this.userId,
     this.phone,
+    this.vendorId,
     this.vendorName,
     this.vendorStatus,
     this.error,
@@ -20,6 +21,7 @@ class AuthState {
   final AuthStatus status;
   final String? userId;
   final String? phone;
+  final String? vendorId;
   final String? vendorName;
   final String? vendorStatus;
   final String? error;
@@ -28,6 +30,7 @@ class AuthState {
     AuthStatus? status,
     String? userId,
     String? phone,
+    String? vendorId,
     String? vendorName,
     String? vendorStatus,
     String? error,
@@ -36,6 +39,7 @@ class AuthState {
       status: status ?? this.status,
       userId: userId ?? this.userId,
       phone: phone ?? this.phone,
+      vendorId: vendorId ?? this.vendorId,
       vendorName: vendorName ?? this.vendorName,
       vendorStatus: vendorStatus ?? this.vendorStatus,
       error: error,
@@ -65,6 +69,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState(
         status: AuthStatus.authenticated,
         userId: userId,
+        vendorId: vendor['id']?.toString(),
         vendorName: vendor['name']?.toString(),
         vendorStatus: vendor['status']?.toString(),
       );
