@@ -14,10 +14,31 @@ import '../widgets/supply_card.dart' show supplyChip;
 /// Supply detail — vertical timeline stepper, items, commercial summary,
 /// evidence section, processing history (blueprint §15.8, §12). The primary
 /// CTA becomes active in Big Phase 11's state machine.
-class SupplyDetailScreen extends ConsumerWidget {
+class SupplyDetailScreen extends ConsumerStatefulWidget {
   const SupplyDetailScreen({super.key, required this.supplyId});
 
   final String supplyId;
+
+  @override
+  ConsumerState<SupplyDetailScreen> createState() => _SupplyDetailScreenState();
+}
+
+class _SupplyDetailScreenState extends ConsumerState<SupplyDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Same class of bug as request_detail_screen.dart: supplyDetailProvider
+    // is a per-id family that starts empty until explicitly loaded — the
+    // only existing .load() call in this file ran after a video upload
+    // succeeded, never on first open. Opening a supply straight from the
+    // Active tab always showed "Supply order unavailable" for a real,
+    // existing supply order. Load on every open, since status/events/
+    // evidence genuinely change between visits (that's the whole point of
+    // this screen — tracking a supply through its stage transitions).
+    Future.microtask(
+      () => ref.read(supplyDetailProvider(widget.supplyId).notifier).load(widget.supplyId),
+    );
+  }
 
   static const _stages = [
     'AWARDED',
@@ -47,7 +68,8 @@ class SupplyDetailScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final supplyId = widget.supplyId;
     final state = ref.watch(supplyDetailProvider(supplyId));
     final supply = state.supply;
 
@@ -281,11 +303,11 @@ class SupplyDetailScreen extends ConsumerWidget {
 
     try {
       final suppliesApi = ref.read(suppliesApiProvider);
-      await suppliesApi.uploadQualityVideo(supplyId, file.path, onProgress: (sent, total) {
+      await suppliesApi.uploadQualityVideo(widget.supplyId, file.path, onProgress: (sent, total) {
         final progress = total > 0 ? sent / total : 0.0;
         _uploadProgress.value = progress;
       });
-      await ref.read(supplyDetailProvider(supplyId).notifier).load(supplyId);
+      await ref.read(supplyDetailProvider(widget.supplyId).notifier).load(widget.supplyId);
       if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
       messenger.showSnackBar(
         const SnackBar(content: Text('Evidence submitted — you can now mark the supply packed.')),
@@ -315,7 +337,7 @@ class SupplyDetailScreen extends ConsumerWidget {
       ),
       child: FilledButton(
         onPressed: () async {
-          final notifier = ref.read(supplyDetailProvider(supplyId).notifier);
+          final notifier = ref.read(supplyDetailProvider(widget.supplyId).notifier);
           final target = switch (nextAction) {
             'Mark Accepted' => 'ACCEPTED',
             'Mark Processing Started' => 'PROCESSING',
@@ -339,7 +361,7 @@ class SupplyDetailScreen extends ConsumerWidget {
               SnackBar(content: Text(target == 'ACCEPTED' ? 'Order accepted' : 'Marked ${target.replaceAll('_', ' ').toLowerCase()}')),
             );
           } else if (!ok && context.mounted) {
-            final error = ref.read(supplyDetailProvider(supplyId)).error;
+            final error = ref.read(supplyDetailProvider(widget.supplyId)).error;
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error ?? 'Update failed')));
           }
         },
@@ -483,7 +505,7 @@ class _UploadProgressDialog extends StatelessWidget {
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       content: ValueListenableBuilder<double>(
-        valueListenable: SupplyDetailScreen._uploadProgress,
+        valueListenable: _SupplyDetailScreenState._uploadProgress,
         builder: (context, value, _) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [

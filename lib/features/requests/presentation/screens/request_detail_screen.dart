@@ -11,13 +11,35 @@ import '../widgets/request_card.dart' show StatusChip;
 /// Request detail — fixed offer: sticky Decline / Accept Offer; RFQ: sticky
 /// Submit/Edit Quote. After award to another vendor the actions disappear
 /// (blueprint §15.5, §15.6, §5.4 sticky bottom actions).
-class RequestDetailScreen extends ConsumerWidget {
+class RequestDetailScreen extends ConsumerStatefulWidget {
   const RequestDetailScreen({super.key, required this.requestId});
 
   final String requestId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RequestDetailScreen> createState() => _RequestDetailScreenState();
+}
+
+class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // requestDetailProvider is a per-id family that starts empty until
+    // something explicitly loads it. Nothing did: request_card.dart's
+    // onTap just pushes this route with no pre-fetch, so opening a request
+    // straight from the list always showed "Requirement unavailable" —
+    // even for a real, existing, correctly-targeted request. Load on
+    // every open (not just when never-loaded before), since the request's
+    // own state (recipientStatus, myQuote, deadline) can genuinely change
+    // between visits.
+    Future.microtask(
+      () => ref.read(requestDetailProvider(widget.requestId).notifier).load(widget.requestId),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final requestId = widget.requestId;
     final state = ref.watch(requestDetailProvider(requestId));
     final notifier = ref.read(requestDetailProvider(requestId).notifier);
 
