@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,8 +20,8 @@ class _PhoneEntryScreenState extends ConsumerState<PhoneEntryScreen> {
 
   Future<void> _sendCode() async {
     final phone = _controller.text.trim();
-    if (phone.length < 10) {
-      setState(() => _error = 'Enter a valid mobile number');
+    if (phone.length != 10) {
+      setState(() => _error = 'Enter a valid 10-digit mobile number');
       return;
     }
     setState(() {
@@ -64,10 +65,15 @@ class _PhoneEntryScreenState extends ConsumerState<PhoneEntryScreen> {
               TextField(
                 controller: _controller,
                 keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
                 decoration: const InputDecoration(
                   labelText: 'Mobile number',
                   hintText: '9000000001',
                   prefixText: '+91 ',
+                  counterText: '',
                 ),
               ),
               if (_error != null) ...[
