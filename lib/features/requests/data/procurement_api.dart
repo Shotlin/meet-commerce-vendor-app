@@ -13,6 +13,7 @@ class RequestItem {
     required this.unit,
     this.fixedUnitPrice,
     this.categoryName,
+    this.imageUrl,
   });
 
   final String id;
@@ -21,6 +22,10 @@ class RequestItem {
   final String unit;
   final num? fixedUnitPrice;
   final String? categoryName;
+  // The catalog product's own thumbnail (`products.thumbnail_url`), joined
+  // server-side off the item's `product_id` — null for a legacy item with
+  // no product link (pre-migration-143, free-text only).
+  final String? imageUrl;
 
   factory RequestItem.fromJson(Map<String, dynamic> json) => RequestItem(
         id: json['id'].toString(),
@@ -31,6 +36,9 @@ class RequestItem {
             ? null
             : num.tryParse('${json['fixed_unit_price']}'),
         categoryName: json['category_name']?.toString(),
+        imageUrl: (json['product_image_url'] as String?)?.trim().isNotEmpty == true
+            ? json['product_image_url'] as String
+            : null,
       );
 
   Map<String, dynamic> toQuoteInput({required num quotedQuantity, required num unitPrice}) => {

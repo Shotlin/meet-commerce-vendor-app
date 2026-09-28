@@ -101,4 +101,44 @@ void main() {
       expect(request.myQuote, isNull);
     });
   });
+
+  group('RequestItem.fromJson — product image', () {
+    // The request/quote screens showed no product image at all — the
+    // backend's `product_image_url` (a LEFT JOIN onto `products.thumbnail_url`
+    // off the item's `product_id`) was never parsed into the model.
+    test('parses a real product_image_url into imageUrl', () {
+      final item = RequestItem.fromJson({
+        'id': 'item-1',
+        'item_name': 'Salmon Steak (250 g)',
+        'requested_quantity': '1',
+        'unit': 'KG',
+        'product_image_url': 'https://res.cloudinary.com/h9sgzkie/image/upload/salmon.jpg',
+      });
+
+      expect(item.imageUrl, 'https://res.cloudinary.com/h9sgzkie/image/upload/salmon.jpg');
+    });
+
+    test('a missing product_image_url (legacy, no product link) parses as null, not a broken link', () {
+      final item = RequestItem.fromJson({
+        'id': 'item-1',
+        'item_name': 'Legacy item',
+        'requested_quantity': '1',
+        'unit': 'KG',
+      });
+
+      expect(item.imageUrl, isNull);
+    });
+
+    test('an empty-string product_image_url also parses as null', () {
+      final item = RequestItem.fromJson({
+        'id': 'item-1',
+        'item_name': 'Legacy item',
+        'requested_quantity': '1',
+        'unit': 'KG',
+        'product_image_url': '',
+      });
+
+      expect(item.imageUrl, isNull);
+    });
+  });
 }

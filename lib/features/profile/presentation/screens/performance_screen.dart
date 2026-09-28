@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../providers/performance_provider.dart';
+import '../widgets/performance_insights.dart';
 
 /// Vendor performance — transparent metrics (blueprint §15.11): rating,
 /// monthly value/quantity, completed supplies, on-time rate, issues.
@@ -42,7 +43,17 @@ class PerformanceScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     children: [
                       _buildMetrics(state),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
+                      const Text('Monthly earnings',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                      const SizedBox(height: 10),
+                      EarningsChartCard(state: state, summary: PerformanceSummary.fromState(state)),
+                      const SizedBox(height: 20),
+                      const Text('Top selling products',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink)),
+                      const SizedBox(height: 10),
+                      TopProductsCard(state: state, summary: PerformanceSummary.fromState(state)),
+                      const SizedBox(height: 20),
                       _RecentFeedback(state: state),
                     ],
                   ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/product_thumbnail.dart';
 import '../../data/procurement_api.dart';
 import '../providers/request_detail_provider.dart';
 import '../widgets/request_card.dart' show StatusChip;
@@ -132,7 +133,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            ProductThumbnail(
+                              imageUrl: item.imageUrl,
+                              heroTag: 'request-item-${item.id}',
+                              title: item.itemName,
+                            ),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,17 +153,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                                 ],
                               ),
                             ),
-                            Text(
-                              '${_fmtNum(item.requestedQuantity)} ${item.unit}',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${_fmtNum(item.requestedQuantity)} ${item.unit}',
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.ink),
+                                ),
+                                if (request.isFixedOffer && item.fixedUnitPrice != null)
+                                  Text(
+                                    '₹${_fmtNum(item.fixedUnitPrice!)}',
+                                    style: const TextStyle(fontSize: 12, color: AppColors.inkSecondary),
+                                  ),
+                              ],
                             ),
-                            if (request.isFixedOffer && item.fixedUnitPrice != null) ...[
-                              const SizedBox(width: 10),
-                              Text(
-                                '₹${_fmtNum(item.fixedUnitPrice!)}',
-                                style: const TextStyle(fontSize: 13, color: AppColors.inkSecondary),
-                              ),
-                            ],
                           ],
                         ),
                       ),

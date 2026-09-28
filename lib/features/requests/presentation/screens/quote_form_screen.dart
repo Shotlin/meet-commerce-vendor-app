@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/product_thumbnail.dart';
 import '../../data/procurement_api.dart';
 import '../providers/request_detail_provider.dart';
 
@@ -267,7 +268,15 @@ class _QuoteFormScreenState extends ConsumerState<QuoteFormScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              ProductThumbnail(
+                imageUrl: item.imageUrl,
+                size: 44,
+                heroTag: 'quote-item-${item.id}',
+                title: item.itemName,
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(item.itemName,
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink)),

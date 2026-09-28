@@ -20,7 +20,21 @@ class PerformanceNotifier extends StateNotifier<PerformanceState> {
     state = const PerformanceState(loading: true);
     try {
       final data = await _api.get(ApiConstants.vendorPerformance);
-      state = PerformanceState(data: data is Map ? Map<String, dynamic>.from(data) : {});
+      final merged = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+      // `/performance` returns {vendor, performance} only — `reviews` lives
+      // on the separate `/reviews` endpoint and was never actually fetched
+      // here, so "Recent store feedback" always showed its empty state
+      // regardless of real reviews. Fetched second and merged in under the
+      // same `reviews` key the UI already reads; a failure here (network
+      // blip, etc.) never blocks the metrics that already loaded above —
+      // it just leaves the feedback list empty for this refresh.
+      try {
+        final reviews = await _api.get(ApiConstants.vendorReviews, query: {'limit': 5});
+        merged['reviews'] = reviews is List ? reviews : const [];
+      } catch (_) {
+        merged['reviews'] = const [];
+      }
+      state = PerformanceState(data: merged);
     } catch (error) {
       state = PerformanceState(error: error.toString());
     }
