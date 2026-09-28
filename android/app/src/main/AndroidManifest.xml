@@ -5,7 +5,7 @@
          FCM pushes delivered while the app is backgrounded/closed. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="freshcuts_vendor_app"
+        android:label="FreshCuts Vendor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -32,6 +32,16 @@
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <!-- Brand glyph + tint for every FCM notification the system tray
+             displays while the app is backgrounded/closed. Without these
+             Android falls back to the launcher icon, which it renders as a
+             flat grey/white square. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_accent" />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

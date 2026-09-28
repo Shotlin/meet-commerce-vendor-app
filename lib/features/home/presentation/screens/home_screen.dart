@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../../../active/presentation/providers/supplies_provider.dart';
 import '../../../requests/presentation/providers/request_list_provider.dart';
 
@@ -17,7 +18,14 @@ class HomeScreen extends ConsumerWidget {
     final activeSupplies = ref.watch(suppliesProvider).supplies.where((s) => s.isActive).length;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FreshCuts Vendor'),
+        titleSpacing: 16,
+        title: const Row(
+          children: [
+            BrandLogo(height: 30),
+            SizedBox(width: 10),
+            Text('FreshCuts Vendor'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),

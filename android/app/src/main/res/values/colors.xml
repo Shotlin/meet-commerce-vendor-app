@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Tint behind the white status-bar glyph in the notification shade. -->
+    <color name="notification_accent">#D02428</color>
+</resources>

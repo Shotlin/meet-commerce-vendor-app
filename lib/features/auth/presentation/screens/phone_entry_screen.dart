@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../providers/auth_provider.dart';
 
 class PhoneEntryScreen extends ConsumerStatefulWidget {
@@ -48,6 +49,8 @@ class _PhoneEntryScreenState extends ConsumerState<PhoneEntryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
+              const Align(alignment: Alignment.centerLeft, child: BrandLogo(height: 64)),
+              const SizedBox(height: 20),
               Text(
                 'FreshCuts\nVendor',
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(

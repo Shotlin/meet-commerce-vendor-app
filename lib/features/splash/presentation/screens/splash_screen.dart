@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/brand_logo.dart';
 
 /// Shown only while the session is being restored on cold start
 /// (`AuthStatus.booting`) — a neutral holding screen so a genuinely
@@ -19,15 +20,7 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'FreshCuts\nVendor',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                    height: 1.1,
-                  ),
-            ),
+            const BrandLogo(height: 88),
             const SizedBox(height: 24),
             const SizedBox(
               width: 24,

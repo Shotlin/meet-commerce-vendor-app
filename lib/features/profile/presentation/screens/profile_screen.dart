@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Profile — business info, KYC status, documents, service areas, account
@@ -31,7 +32,10 @@ class ProfileScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 26,
                   backgroundColor: AppColors.brandRedSurface,
-                  child: const Icon(Icons.storefront, color: AppColors.brandRed),
+                  child: const Padding(
+                    padding: EdgeInsets.all(9),
+                    child: BrandLogo(height: 26),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
