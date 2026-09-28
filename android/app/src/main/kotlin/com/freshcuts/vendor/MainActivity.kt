@@ -1,4 +1,4 @@
-package com.freshcuts.freshcuts_vendor_app
+package com.freshcuts.vendor
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -11,6 +11,18 @@ class ApiConstants {
     defaultValue: 'http://localhost:4500/api/v1',
   );
 
+  // Socket.IO connects to the bare API origin, not the `/api/v1` REST
+  // prefix (the server mounts Socket.IO directly on the Fastify HTTP
+  // server, same as the customer app's ApiConstants.socketUrl). Override
+  // explicitly at build time if it ever needs to differ from baseUrl's
+  // own origin, e.g.:
+  //   flutter run --dart-define=SOCKET_URL=https://api.fc.opslin.com
+  static const String _socketUrlOverride = String.fromEnvironment('SOCKET_URL');
+  static String get socketUrl {
+    if (_socketUrlOverride.isNotEmpty) return _socketUrlOverride;
+    return baseUrl.replaceFirst(RegExp(r'/api/v\d+/?$'), '');
+  }
+
   // Auth (existing OTP backend)
   static const String sendOtp = '/auth/send-otp';
   static const String verifyOtp = '/auth/verify-otp';

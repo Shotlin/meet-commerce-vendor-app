@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,23 +21,63 @@ import '../features/profile/presentation/screens/store_allotment_screen.dart';
 import '../features/profile/presentation/screens/tax_licenses_screen.dart';
 import '../features/requests/presentation/screens/requests_screen.dart';
 import '../features/shell/presentation/vendor_shell.dart';
+import '../features/splash/presentation/screens/splash_screen.dart';
+
+/// Root Navigator key, exposed so app-root widgets that sit ABOVE the
+/// Router in the tree (e.g. `ProcurementAlertListener`, mounted via
+/// `MaterialApp.router`'s own `builder`) can still reach a real Navigator
+/// context to show a dialog/snackbar in response to a socket event —
+/// `builder`'s own context has no Navigator ancestor (the Navigator is a
+/// descendant, built by the `child` it's handed), so `Navigator.of()`/
+/// `showDialog()` from there would throw "No Navigator found".
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Pure decision function behind the router's `redirect` — pulled out so
+/// the actual auth-state → destination logic can be unit-tested directly,
+/// without needing a full widget tree, a real GoRouter, or real screens.
+/// Returns the path to redirect to, or `null` to stay where the caller is.
+///
+/// While `booting` (session restore in flight), this always sends the
+/// caller to `/splash` and nowhere else — regardless of `initialLocation`
+/// or whatever the caller was trying to open — so a genuinely logged-in
+/// vendor never sees a real flash of the login screen on cold start while
+/// `AuthNotifier.bootstrap()`'s network round trip is still in flight; a
+/// genuinely logged-out one never sees a flash of the home screen either.
+String? resolveAuthRedirect(AuthStatus status, String path) {
+  final onSplash = path == '/splash';
+  final onAuthScreen = path == '/phone' || path.startsWith('/otp');
+
+  if (status == AuthStatus.booting) {
+    return onSplash ? null : '/splash';
+  }
+  if (status == AuthStatus.authenticated) {
+    return (onSplash || onAuthScreen) ? '/home' : null;
+  }
+  // unauthenticated or unreachable
+  return onAuthScreen ? null : '/phone';
+}
 
 final routerProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: '/home',
-    redirect: (context, state) {
-      final status = auth.status;
-      final loggingIn = state.uri.path == '/phone' || state.uri.path.startsWith('/otp');
-      final loggingOut = status == AuthStatus.unauthenticated || status == AuthStatus.unreachable;
-
-      if (status == AuthStatus.booting) return '/phone';
-      if (loggingOut && !loggingIn) return '/phone';
-      if (status == AuthStatus.authenticated && loggingIn) return '/home';
-      return null;
-    },
+    navigatorKey: rootNavigatorKey,
+    // Cold start always opens here, never on '/home' or '/phone' directly —
+    // which one is actually correct isn't known yet (the session restore
+    // that decides it, AuthNotifier.bootstrap(), hasn't run its first
+    // network round trip). Landing on '/phone' by default (the previous
+    // behaviour) meant a genuinely logged-in vendor saw a real flash of the
+    // login screen on every cold start, for exactly as long as that
+    // request took — this neutral screen is what closes that gap; see
+    // resolveAuthRedirect's own doc comment for how it's enforced
+    // regardless of this value.
+    initialLocation: '/splash',
+    redirect: (context, state) => resolveAuthRedirect(auth.status, state.uri.path),
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/phone',
         builder: (context, state) => const PhoneEntryScreen(),

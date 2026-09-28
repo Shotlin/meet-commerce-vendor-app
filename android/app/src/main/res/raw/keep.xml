@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Android resource shrinker only keeps resources it can find a static
+  reference to (an @raw/... in XML, or an R.raw.... in code). The
+  notification-channel sound is looked up purely by string name at runtime
+  (flutter_local_notifications' RawResourceAndroidNotificationSound), which
+  the shrinker cannot see — without this, a release build silently strips
+  the file and the vendor's alert sound falls back to whatever Android's
+  default notification tone is, with no error anywhere to catch it.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/new_requirement_alert" />

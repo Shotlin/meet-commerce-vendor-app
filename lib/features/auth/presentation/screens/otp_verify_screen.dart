@@ -60,8 +60,24 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
                 keyboardType: TextInputType.number,
                 maxLength: 6,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: 8),
-                decoration: const InputDecoration(counterText: '', hintText: '123456'),
+                autofocus: true,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: 8, color: AppColors.ink),
+                // The placeholder used to be the literal digits '123456' in
+                // the exact same bold, near-black style as real typed
+                // input — genuinely indistinguishable from a real code at a
+                // glance, which is exactly what was reported. A masked,
+                // deliberately lighter/smaller hint can never be confused
+                // for a real value someone actually typed.
+                decoration: const InputDecoration(
+                  counterText: '',
+                  hintText: '••••••',
+                  hintStyle: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 8,
+                    color: AppColors.subtle,
+                  ),
+                ),
               ),
               if (_error != null) ...[
                 const SizedBox(height: 8),
